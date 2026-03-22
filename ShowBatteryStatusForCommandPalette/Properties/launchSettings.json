@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ShowBatteryStatusForCommandPalette (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "ShowBatteryStatusForCommandPalette (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

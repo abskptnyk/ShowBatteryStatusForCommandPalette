@@ -9,6 +9,7 @@ using System.IO;
 using System.Text;
 using Windows.System.Power;
 using Microsoft.Win32;
+using Windows.UI.ViewManagement;
 
 namespace ShowBatteryStatusForCommandPalette;
 
@@ -16,6 +17,7 @@ internal sealed partial class ShowBatteryStatusForCommandPalettePage : ListPage
 {
     private ListItem? _batteryItem;
     private string? _lastIconPath;
+    private readonly UISettings _uiSettings = new();
 
     public ShowBatteryStatusForCommandPalettePage()
     {
@@ -24,7 +26,12 @@ internal sealed partial class ShowBatteryStatusForCommandPalettePage : ListPage
 
         PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
         PowerManager.RemainingChargePercentChanged += OnRemainingChargePercentChanged;
+        _uiSettings.ColorValuesChanged += OnColorValuesChanged;
+    }
 
+    private void OnColorValuesChanged(UISettings sender, object args)
+    {
+        UpdateBatteryDisplay();
     }
 
     private static bool IsDarkTheme()

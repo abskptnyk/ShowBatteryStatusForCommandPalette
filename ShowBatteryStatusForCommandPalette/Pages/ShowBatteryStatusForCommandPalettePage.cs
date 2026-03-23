@@ -7,8 +7,8 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 using System;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using Windows.System.Power;
+using Microsoft.Win32;
 
 namespace ShowBatteryStatusForCommandPalette;
 
@@ -24,6 +24,15 @@ internal sealed partial class ShowBatteryStatusForCommandPalettePage : ListPage
 
         PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
         PowerManager.RemainingChargePercentChanged += OnRemainingChargePercentChanged;
+
+    }
+
+    private static bool IsDarkTheme()
+    {
+        var key = Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+        var value = key?.GetValue("AppsUseLightTheme");
+        return value is int i && i == 0;
     }
 
     private IconInfo MakeBatteryIcon(int percent, string status)
@@ -32,15 +41,16 @@ internal sealed partial class ShowBatteryStatusForCommandPalettePage : ListPage
         double fillHeight = 100 * pct;
         double y = 110 - fillHeight;
         string fill = pct > 0.2 ? "#F5A623" : "#E24B4A";
+        string stroke = IsDarkTheme() ? "white" : "black"; 
 
         if (status == "Charging") fill = "#57D156";
         if (status == "Idle" && percent == 100) fill = "#ffffff";
 
         string svg = $"""
         <svg width="400" height="400" viewBox="0 0 116 116">
-           <rect x="44" y="6" width="28" height="4" stroke-width="3" stroke="black" rx="1"/>
+           <rect x="44" y="6" width="28" height="4" stroke-width="3" stroke="{stroke}" rx="1"/>
            <rect x="32" y="{y:F1}" width="52" height="{fillHeight:F1}" stroke="none" stroke-width="3" fill="{fill}"/>
-           <rect x="32" y="10" width="52" height="100" stroke="black" stroke-width="3" rx="4" fill="none"/>
+           <rect x="32" y="10" width="52" height="100" stroke="{stroke}" stroke-width="3" rx="4" fill="none"/>
         </svg>
         """;
 
